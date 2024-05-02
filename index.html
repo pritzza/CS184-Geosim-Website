@@ -39,7 +39,7 @@
     <section id="summary">
         <h2>About</h2>
         <p><strong>Title:</strong> GeoSim</p>
-        <p><strong>Summary:</strong> We build a hardware-accelerated ray-marcher capable of handling real-time rendering in non-euclidian space. During the process we developed understanding of the algorithmic inner-workings of projecting non-euclidian geometries onto a 2D plane, the CUDA programming model, and basic hardware-acceleration programming principles.</p>
+        <p><strong>Summary:</strong> We build a hardware-accelerated ray-marcher capable of handling real-time rendering in non-euclidian geometries. In the process we developed understanding of ray marching, the mathematics of non-euclidean geometry, the CUDA programming model, and basic hardware-acceleration programming principles.</p>
         <p><strong>Team Members:</strong></p>
         <ul>
             <li>Nico Castaneda (CS 284B)</li>
@@ -51,6 +51,17 @@
     <section id="problem">
         <h2>Problem Description</h2>
         <p>We want to visualize non-euclidean geometry with photorealistic accuracy.</p>
+    </section>
+
+    <section id="problem">
+        <h2>Results</h2>
+        <p>
+            <img src="images/cuda.png" width="80%">
+            <img src="images/hyp (trimmed).gif" width="80%">
+            <br>
+            <br>
+            See more in the results section below.
+        </p>
     </section>
 
     <section id="technical-approach">
@@ -118,55 +129,48 @@
     <section id="challenges">
         <h2>Challenges</h2>
         <h3>Mathematics of Non-Euclidean Geometry</h3>
-        <p>One of the greatest challenges was understanding the underlying mathematics of non euclidean geometry. Few people have made 3D visualizations of hyperbolic space and fewer have made accessible resources. We based much of our efforts off the works of Rémi Coulon, Elisabetta A. Matsumoto, Henry Segerman, Steve J. Trettel: "Ray-marching Thurston geometries" and "Non-euclidean virtual reality I: explorations of H3". The former being a mathematically rich but dense 140+ page dissertation on how to visualize all 8 of the Thurston Geometries. The dissertation goes into much mathematical rigor, touching on primarily geometric topology and differential geometry as well as numerical analysis and differential equations. Concepts quite foreign to us took a while to understand and implement correctly. Not having an intuition for the visuals of non euclidean geometry, many unit tests were made to verify the numerical results of all our calculations. Eventually it was all mostly understood: the different models of H3, their numerical representations, numerical stabilities, computational costs, and other pros and cons; we chose the use the hyperboloid model so we needed to know how to represent and verify that a point lie on the hyperboloid, tell if a direction was in the tangent space of a point, how to flow along the geodesics of hyperbolic space, how to represent a scene in hyperbolic space. Understanding these mathematics was crucial to creating and implementing a hyperbolic ray marcher.</p>
+        <p>One of the greatest challenges was understanding the underlying mathematics of non euclidean geometry. We began with no exposure to any formal mathematical ideas about noneuclidean geometry. Few people have made 3D visualizations of hyperbolic space and fewer have made accessible resources. We based much of our efforts off the works of Rémi Coulon, Elisabetta A. Matsumoto, Henry Segerman, Steve J. Trettel: <a href="https://arxiv.org/abs/2010.15801">Ray-marching Thurston geometries</a> and <a href="https://arxiv.org/abs/1702.04004"> Non-euclidean virtual reality I: explorations of H3</a>. The former being a mathematically rich but dense 140+ page dissertation on how to visualize all 8 of the Thurston Geometries. The dissertation goes into much mathematical rigor, touching on primarily geometric topology and differential geometry as well as numerical analysis and differential equations. Concepts quite foreign to us took a while to understand and implement correctly. Not having an intuition for the visuals of non euclidean geometry, many unit tests were made to verify the numerical results of all our calculations. Eventually it was all mostly understood: the different models of H3, their numerical representations, numerical stabilities, computational costs, and other pros and cons; we chose the use the hyperboloid model so we needed to know how to represent and verify that a point lie on the hyperboloid, tell if a direction was in the tangent space of a point, how to flow along the geodesics of hyperbolic space, how to represent a scene in hyperbolic space. Understanding these mathematics was crucial to creating and implementing a hyperbolic ray marcher.</p>
 
         <h3>Compute</h3>
-        <p>The first problem we encounter is compute. As a team of three, none of us had access to a CUDA-ready GPU. We obtained compute from <a href="https://www.csua.berkeley.edu/">CSUA</a> that has NVIDIA GPUs. We also had a difficult time learning about the c++ compilation tooling on the remote machine. The remote machine has nvcc cuda compiler ready, however, setting up the compilation pipeline using CMake posed the team another challenge. Eventually, we managed to compile a simple cuda program. Directly writing code in cuda on a remote machine does not provide a "visual" feedback. Instead, we decide to prototype our H3 raymarching algorithm in an existing CPU-based custom <a href="https://github.com/pritzza/Rodent-Raytacer">pathtracer</a> written by Jonathan.</p>
+        <p>The first problem we encounter is compute. As a team of three, none of us had access to a CUDA-ready GPU. We obtained compute from <a href="https://www.csua.berkeley.edu/">CSUA</a> that has NVIDIA GPUs. We also had a difficult time learning about the c++ compilation tooling on the remote machine. The remote machine has nvcc cuda compiler ready, however, setting up the compilation pipeline using CMake posed the team another challenge. Eventually, we managed to compile a simple cuda program. Directly writing code in cuda on a remote machine does not provide a "visual" feedback. Instead, we decide to prototype our H3 raymarching algorithm in an existing CPU-based custom <a href="https://github.com/pritzza/Rodent-Raytracer">pathtracer</a> written by Jonathan.</p>
         
         <h3>Hyperbolic Raymarching</h3>
         <p>Conquering the foreign abstract mathematics and then its discrete numerical representation, we needed to adapt our home made euclidean path tracer into an interactive hyperbolic raymarcher. We began by first engineering the euclidean path tracer into a euclidean ray marcher. In a few short hundred lines of code, we succeeded. The next step was to abstract and generalize the capabilities of the euclidean ray marcher to be able to march in arbitrary geometries. Through  hundreds of lines of debugging tests, hundreds of lines of dedicated scripts to sanity check numerical results, rereads of the math papers, and banging our heads against the wall, we came to a result which we know to be correct. A challenge with the alienness of non-euclidean geometry is our inability to visualize it. </p>
         
-        <h3>Prototyping</h3>
-        <p>To get started, we first refactored the pathtracer into a euclidian ray-marcher...</p>
-    </section>
-
-    <section id="lessons">
-        <h2>Lessons</h2>
-        <!-- Add lessons learned here -->
     </section>
 
     <section id="results">
         <h2>Results</h2>
         <p>Through the work of our team we successfully achieved a working prototype of a software hyperbolic raymarcher and a hardware accelerated CUDA raymarcher primed for generalization of non euclidean geometries. We also got a lot of cool bug art:</p>
-        <!-- Add cool bug art images here -->
+        
+        <br>
+        <img src="images/bugart0.png" width="20%">
+        <img src="images/bugart1.png" width="20%">
+        <img src="images/bugart2.png" width="20%">
+        <img src="images/bugart3.png" width="20%">
+        <br>
+        <br>
+
+        A video of the development of the hyperbolic raymarcher prototype can be seen <a href="https://youtu.be/Il_7HWKKSwU">here</a> and a video of the interactive demo <a href="https://youtu.be/0cmYqJrQKbc">here</a>.
+
+
     </section>
 
     <section id="contributions">
         <h2>Contributions</h2>
-        <!-- Add individual contributions here -->
+        <li>Nico Castaneda: Compute and CUDA ray marcher</li>
+        <li>Tianyun Yuan: Compute, CUDA ray marcher, and DevOps</li>
+        <li>Jonathan Zakharov: Mathematics and hyperbolic prototype</li>
     </section>
 
-    <section id="milestones">
-        <h2>Milestones</h2>
-        <section id="milestone-video">
-            <h3>Video</h3>
-            <p><a href="https://youtu.be/BJTJ8VX4sQs" target="_blank">Watch Video</a></p>
-        </section>
+    <section id="Extra">
+        <h2>Additional Links</h2>
+
         <section id="presentation-slides">
             <h3>Presentation</h3>
             <p><a href="https://docs.google.com/presentation/d/1X_SF3YtQp8ZJrhY0zWKb48ppMzb940puLZtGCGgJMb8/edit?usp=sharing" target="_blank">View Presentation</a></p>
         </section>
     </section>
 
-    <section id="schedule">
-        <h2>Schedule</h2>
-        <p>4/21: Hyperbolic global illumination done. Here we want to be able to say we've achieved our goal and just need to add features to make it look pretty<br><br>
-        4/28: All features to make it performant and look good.</p>
-    </section>
-
-    <section id="resources">
-        <h2>Resources</h2>
-        <p>C++, Google Colab, CUDA, Non-euclidean virtual reality I: explorations of H3, Ray-Marching Thurston Geometries</p>
-    </section>
 </body>
 </html>
