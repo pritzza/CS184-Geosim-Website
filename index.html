@@ -76,7 +76,7 @@
     <section id="summary">
         <h2>About</h2>
         <p><strong>Title:</strong> GeoSim</p>
-        <p><strong>Summary:</strong> We build a hardware-accelerated ray-marcher capable of handling real-time rendering in non-euclidian geometries. In the process we developed understanding of ray marching, the mathematics of non-euclidean geometry, the CUDA programming model, and basic hardware-acceleration programming principles.</p>
+        <p><strong>Summary:</strong> We build a hardware accelerated ray marcher capable of rendering non-euclidian geometries in real time. In the process we developed understanding of ray marching, the mathematics of non-euclidean geometry, the CUDA programming model, and basic hardware-acceleration programming principles.</p>
         <p><strong>Team Members:</strong></p>
         <ul>
             <li>Nico Castaneda (CS 284B)</li>
@@ -172,7 +172,7 @@
         <p>One of the greatest challenges was understanding the underlying mathematics of non euclidean geometry. We began with no exposure to any formal mathematical ideas about noneuclidean geometry. Few people have made 3D visualizations of hyperbolic space and fewer have made accessible resources. We based much of our efforts off the works of Rémi Coulon, Elisabetta A. Matsumoto, Henry Segerman, Steve J. Trettel: <a href="https://arxiv.org/abs/2010.15801">Ray-marching Thurston geometries</a> and <a href="https://arxiv.org/abs/1702.04004"> Non-euclidean virtual reality I: explorations of H3</a>. The former being a mathematically rich but dense 140+ page dissertation on how to visualize all 8 of the Thurston Geometries. The dissertation goes into much mathematical rigor, touching on primarily geometric topology and differential geometry as well as numerical analysis and differential equations. Concepts quite foreign to us took a while to understand and implement correctly. Not having an intuition for the visuals of non euclidean geometry, many unit tests were made to verify the numerical results of all our calculations. Eventually it was all mostly understood: the different models of H3, their numerical representations, numerical stabilities, computational costs, and other pros and cons; we chose the use the hyperboloid model so we needed to know how to represent and verify that a point lie on the hyperboloid, tell if a direction was in the tangent space of a point, how to flow along the geodesics of hyperbolic space, how to represent a scene in hyperbolic space. Understanding these mathematics was crucial to creating and implementing a hyperbolic ray marcher.</p>
 
         <h3>Hyperbolic Raymarching</h3>
-        <p>Conquering the foreign abstract mathematics and then its discrete numerical representation, we needed to adapt our home made euclidean path tracer into an interactive hyperbolic raymarcher. We began by first engineering the euclidean path tracer into a euclidean ray marcher. In a few short hundred lines of code, we succeeded. The next step was to abstract and generalize the capabilities of the euclidean ray marcher to be able to march in arbitrary geometries. Through  hundreds of lines of debugging tests, hundreds of lines of dedicated scripts to sanity check numerical results, rereads of the math papers, and banging our heads against the wall, we came to a result which we know to be correct. A challenge with the alienness of non-euclidean geometry is our inability to visualize it. </p>
+        <p>Conquering the foreign abstract mathematics and then its discrete numerical representation, we needed to adapt our home made euclidean path tracer into an interactive hyperbolic raymarcher. We first began by engineering the euclidean path tracer into a euclidean ray marcher. In a few short hundred lines of code, we succeeded. The next step was to abstract and generalize the capabilities of the ray marcher to be able to march in arbitrary geometries. Through  hundreds of lines of debugging tests, hundreds of lines of dedicated scripts to sanity check numerical results, rereads of the math papers, and banging our heads against the wall, we came to a result which we know to be correct. A challenge with the alienness of non-euclidean geometry is our inability to visualize it. Days were spent realizing the fact that we could not go off visual intuition very much to verify results, hence the need to write many many numerical tests. </p>
         
     </section>
 
@@ -187,8 +187,9 @@
 
     <section id="results">
         <h2>Results</h2>
-        <p>Through the work of our team we successfully achieved a working prototype of a software hyperbolic raymarcher and a hardware accelerated CUDA raymarcher primed for generalization of non euclidean geometries. We also got a lot of cool bug art:</p>
-        
+        <p>Through the work of our team we successfully achieved a working prototype of a software hyperbolic raymarcher and a hardware accelerated CUDA raymarcher primed for generalization of non euclidean geometries. We were able to show our proof of concept: functioning hyperbolic raymarching. Now our CUDA raymarcher is designed to abstract details of what geometry we’re in, meaning implementing arbitrary (non)-euclidean geometry is as simple a task as just slotting in the right math functions.</p>
+        <br>
+        (We also got some cool bug art along the way!)
         <br>
         <img src="images/bugart0.png" width="45%">
         <img src="images/bugart1.png" width="45%">
@@ -203,18 +204,27 @@
 
     <section id="contributions">
         <h2>Contributions</h2>
-        <li>Nico Castaneda: Compute and CUDA ray marcher</li>
-        <li>Tianyun Yuan: Compute, CUDA ray marcher, and DevOps</li>
-        <li>Jonathan Zakharov: Mathematics and hyperbolic prototype</li>
+
+        Nico Castaneda: Compute and CUDA ray marcher
+        <br>
+        Tianyun Yuan: Compute, CUDA ray marcher, and DevOps
+        <br>
+        Jonathan Zakharov: Mathematics and hyperbolic prototype
     </section>
 
     <section id="Extra">
         <h2>Additional Links</h2>
 
-        <section id="presentation-slides">
+        <blockquote>
+            <h3>Development Video</h3>
+            <p><a href="https://docs.google.com/presentation/d/1DGa2JtVpf00P6wfAUAklz1qCobAbrCqFwy42HWV87XU/edit?usp=sharing">View Development Video</a></p>
+
+            <h3>Demo Video</h3>
+            <p><a href="https://docs.google.com/presentation/d/1DGa2JtVpf00P6wfAUAklz1qCobAbrCqFwy42HWV87XU/edit?usp=sharing">View Demo Video</a></p>
+
             <h3>Presentation</h3>
-            <p><a href="https://docs.google.com/presentation/d/1DGa2JtVpf00P6wfAUAklz1qCobAbrCqFwy42HWV87XU/edit?usp=sharing" target="_blank">View Presentation</a></p>
-        </section>
+            <p><a href="https://docs.google.com/presentation/d/1DGa2JtVpf00P6wfAUAklz1qCobAbrCqFwy42HWV87XU/edit?usp=sharing">View Presentation</a></p>
+        </blockquote>
     </section>
 
 </body>
