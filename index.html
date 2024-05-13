@@ -66,6 +66,17 @@
         code {
             font-family: 'Courier New', Courier, monospace;
         }
+        .iframe-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .iframe-container iframe {
+            max-width: 100%;
+            max-height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -85,7 +96,9 @@
         </ul>
     </section>
 
-<iframe src="https://player.vimeo.com/video/945634335?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" width="1280" height="720" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write" title="Non-euclidean solar system"></iframe>
+<div class="iframe-container">
+    <iframe src="https://player.vimeo.com/video/945634335?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" width="640" height="480" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write" title="Non-euclidean solar system"></iframe>
+</div>
 
     <section id="problem">
         <h2>Problem Description</h2>
