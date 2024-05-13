@@ -106,25 +106,14 @@
 
     <section id="problem">
         <h2>Problem Description</h2>
-        <p>We want to visualize non-euclidean geometry with photorealistic accuracy.</p>
-    </section>
-
-    <section id="problem">
-        <h2>Results</h2>
-        <p>
-
-            <br>
-            Footage from our interactive demo of hyperbolic raymarcher prototype:
-            <br>
-            <img src="images/hyp (trimmed).gif" width="80%">
-            <br>
-            Physically-based, real-time rendering of non-euclidean solar system:
-            <br>
-            <img src="images/solar_system_naive.gif" width="80%">
-            <img src="images/solar_system.gif" width="80%">
-            <img src="images/solar_system_2.gif" width="80%">
-
-        </p>
+        <p>For the past several decades, the focus of games and animation was to be as realistic as possible. However, there has been a recent resurgence in more stylized rendering techniques.
+            Essentially all of existing graphics literature and techniques implicitly assume that we are working in euclidean space, which is the geometry that we experience the world in.
+            However, while the world we live in is locally euclidean, there is ample evidence that space actually warps around mass, meaning we don't live in a perfectly euclidean universe.
+            There are actually eight non-degenerate 3-dimensional model geometries that smoothly connect manifold surfaces and are compact. In simpler terms, there are eight geometries that
+            actually make a decent amount of sense to render and visualize. The goal of this project is to leverage all of the things we know about light transport and rendering techniques in the typical euclidean case,
+            and see how they work in a non-euclidean setting. There has been other work in rendering non-euclidean spaces, but these were all for the purpose of mathematical exlporations. Our goal for this project is to
+            render hyperbolic scenes  using advanced ray-marching techniques to achieve high accuracy visualizations.  This work could be leveraged to create an entirely new type of visual experience that has
+            only been minimally explored in a couple of games or short demos.</p>
     </section>
 
     <section id="technical-approach">
@@ -143,22 +132,47 @@
         <p>Additionally, we used NumPy in our Python scripts to write unit test and numerically verify our mathematical computations and results.</p>
 
         <h3>CUDA</h3>
-        <p>Compute Unified Device Architecture (CUDA) is a parallel computing interface that allows non-serial algorithms to be off-loaded onto GPUs. We found CUDA to be particularly helpful, as the non-euclidian ray-marching algorithm can be executed in parallel: pixel values do not depend on each other.</p>
+        <p>
+            Compute Unified Device Architecture (CUDA) is a parallel computing interface that allows non-serial algorithms to be off-loaded onto GPUs. We found CUDA to be particularly helpful, as the non-euclidian ray-marching algorithm can be executed in parallel: pixel values do not depend on each other.
+            Additionally, the CUDA programming model is pretty streamless to integrate with a typical C++ workflow as long as you have access t a CUDA-capable GPU. For the most part, the difficulty of integrating CUDA just lies in passing memory pointers between the host and device.
+        </p>
 
         <h4>Kernel, Block and Thread</h4>
-        <p>When offloading work to GPU, we initialize a CUDA kernel, which is executed by many threads in parallel. The threads are then organized into blocks, within which the threads synchronize and communicate through shared GPU memory. This model allows for massive parallelism. In our implementation, we initialize a fixed size of CUDA blocks, each block containing a fixed size of CUDA threads. Each thread is responsible for the rendering algorithm of one pixel. We index the workers threads in a two-dimensional array, where we intuitively assign pixel coordinates to each thread, and dispatch the rendering work.</p>
+        <p>
+            When offloading work to GPU, we initialize a CUDA kernel, which is executed by many threads in parallel. The threads are then organized into blocks, within which the threads synchronize and communicate through shared GPU memory. This model allows for massive parallelism. In our implementation, we initialize a fixed size of CUDA blocks, each block containing a fixed size of CUDA threads. Each thread is responsible for the rendering algorithm of one pixel. We index the workers threads in a two-dimensional array, where we intuitively assign pixel coordinates to each thread, and dispatch the rendering work.
+        </p>
 
     </section>
 
     <section id="algorithm">
+        <h2>The Math</h2>
+        <p>
+            There are many different ways to model hyperbolic space in a way that is presentable. For the purpose of this project, we chose to utilize the hyperboloid model, which is a projective model of hyperbolic space.
+            The following is the two-dimensional example, which generalizes up to higher dimensions:
+        </p>
+        <img src="images/HyperboloidProjection.png" width="80%">
+        <p>
+            In this two-dimensional example, our hyperbolic flatlander walks along the surface of the hyperboloid, following its natural curvature. In order to visualize this flatlander in our own euclidean space, we project its hyperbolic coordinate down onto a
+            disk that is centered below the origin. This is a very powerful and simply model of the space, as it allows us to efficiently embed the hyperbolic space in a familiar euclidean setting with very minimal overhead in terms of scene representation. However,
+            this introduces an additional dimension, so our hyperbolic math ends up being four dimensional, which we project down to a three dimensional grid in order to render.
+        </p>
+
         <h2>The Idea</h2>
-        <p>The key idea at hand is simple. Assuming familiarity with raytracing, in which scenes are represented explicitly and ray-geometry intersections can be solved for analytically, ray marching is the implicit and approximate counterpart. Instead of solving an equation to find the intersection of a ray and a primitive like in raytracing, ray marching represents its primitive with signed distance functions (SDFs) which measure the signed distance between a point and the surface of the primitive. By taking the signed distance between our primitive and our ray origin, we can measure how much closer we can move or "march/step" in the direction of the ray before intersecting. We can repeat this routine until one of two conditions is met: we've reached an arbitrarily close distance from our primitive and can approximate the ray's intersection with it, or we have taken an arbitrary number of steps without reaching the previous condition, thus not intersecting any primitive. This is the algorithm of ray marching, abstract and agnostic of any geometries.</p>
+        <p>With a conceptual model of hyperbolic space, the key insight that allows us to render hyperbolic scenes is simple. Assuming familiarity with raytracing, in which scenes are represented explicitly and ray-geometry intersections can be solved for analytically, ray marching is the implicit and approximate counterpart. Instead of solving an equation to find the intersection of a ray and a primitive like in raytracing, ray marching represents its primitive with signed distance functions (SDFs) which measure the signed distance between a point and the surface of the primitive. By taking the signed distance between our primitive and our ray origin, we can measure how much closer we can move or "march/step" in the direction of the ray before intersecting. We can repeat this routine until one of two conditions is met: we've reached an arbitrarily close distance from our primitive and can approximate the ray's intersection with it, or we have taken an arbitrary number of steps without reaching the previous condition, thus not intersecting any primitive. This is the algorithm of ray marching, abstract and agnostic of any geometries.</p>
         <p>In our classical renderers and day to day lives, we assume the geometric optics model of light which states that light travels along the shortest path: along rays or straight lines. This assumption enables much of raytracing. However, dropping Euclid's fifth postulate:</p>
         <blockquote>
             <p>"if a straight line falling on two straight lines make the interior angles on the same side less than two right angles, the two straight lines, if produced indefinitely, meet on that side on which are the angles less than the two right angles."</p>
         </blockquote>
         <p>We leave the land of euclidean geometry, and can no longer make this assumption. In non-euclidean geometries, the shortest path between two points need not be a straight line. Yet light still does travel along geodesics. This is where we must turn to ray marching as our technique for its ability to march along the geodesic path of light. That is, we use ray marching as described above to march along the geodesic path of light in our non-euclidean space.</p>
+        <p>
 
+        <h2>The Implementation</h2>
+            Equipped with this general method of marching rays, we now have to delve a bit into the nuances of working in hyperbolic space. Similar to moving along the surface of any non-flat object, to move along a geodesic,
+            you move in a straight line plus some amount of curvature required to stay on the surface. In hyperbolic space, you have constant negative gaussian curvature at all points. This means each point has a local tangent space
+            of valid directions that you can flow into. Thus, at every marching step, you not only have to flow along a curve, but you have to calculate what the new direction you are going in relative to your current position. However, due 
+            to this fundamental change in how space is laid out, many of the traditional spatial partitioning schemes used in acceleration structures like KD-trees or octrees don't work, since up is different relative to each point. Thus,
+            for this project, we limit ourselves to the following fairly basic marching algorithm that we accelerate using CUDA:
+        </p>
         <pre><code>
             ComputeClosestIntersection(Ray r, Scene s)
             {
@@ -185,7 +199,56 @@
                 return NIL
             }
         </code></pre>
-        </section>            
+
+        <p>
+            In order to convert this algorithm into a GPU-friendly one, we have to first configure what is executed on the host versus what we offload onto the device, as well as ensure we
+            have minimal communication needed between the two. In our implementation, we allocate all of the device memory on the host, load the textures, and then create a render_pixel kernel call
+            for each pixel in the output image, which in our case is 1280x720p. After which, because we are doing fairly simple marching, we end up minimal branches throughout, and even less divergence.
+            This allows us to effectively utilize as many of the threads at once as possible and avoid inactive threads due to branch divergence.
+        </p>
+
+        <p>
+             In addition to simply converting the CPU hyperbolic path tracer into a GPU accelerated one, we were also to add several features that greatly improve the quality of rendered images.
+             Specifically, texture mapping, environment lighting, and environment mapping were added. This allowed us to have much more interesting renders that really showcase the fun and quirky weirdness
+             that you are able to get from using a non-euclidean geometry.
+        </p>
+
+        </section>
+        
+    <section id="problem">
+        <h2>Results</h2>
+        <p>
+            After pouring through math literature, we were able to successfully create a feature rich hyperbolic renderer that is able to run in real time.
+            Specifically, at 6 rays per pixel and 6 bounces per ray, we are able to generate path traced hyperbolic scenes at 720p at around 30FPS using an RTX 3070.
+            The following images are the results of different versions of our hyperbolic renderer.
+        </p>
+        <p>
+            <br>
+            Footage from our interactive demo of our CPU hyperbolic raymarcher prototype:
+            <br>
+            <img src="images/hyp (trimmed).gif" width="80%">
+            <br>
+            Physically-based, real-time rendering of non-euclidean sphere field:
+            <br>
+            <video width="80%"  controls>
+                <source src="images/lightspeed.mp4" type="video/mp4">
+            </video>
+            <video width="80%"  controls>
+                <source src="images/stretched.mp4" type="video/mp4">
+            </video>
+            <video width="80%"  controls>
+                <source src="images/warping.mp4" type="video/mp4">
+            </video>
+            <br>
+
+            Physically-based, real-time rendering of non-euclidean solar system:
+            <br>
+            <img src="images/solar_system_naive.gif" width="80%">
+            <img src="images/solar_system.gif" width="80%">
+            <img src="images/solar_system_2.gif" width="80%">
+
+        </p>
+    </section>    
 
     <section id="challenges">
         <h2>Challenges</h2>
@@ -207,23 +270,6 @@
 
         <h3>Mathematics</h3>
         <p>Mathematical understanding, and more broadly, all understanding cannot be rushed. One can reasonably estimate the times it takes to perform a feat of physical labor. One can also, with less accuracy though, estimate the times it takes to perform a feat of engineering. However one cannot accurately estimate the times it takes to perform a feat of intellectuality. Intellectual deadlines need to be taken with a grain of salt because it is difficult to know when a concept will make sense. Yet in a context such as industry, academia, or this project, where deadlines are final, it only means they need to be treated with a lot more respect and caution. One cannot foresee when a concept will make sense, thus they must be proactive as resources permit.</p>
-    </section>
-
-    <section id="results">
-        <h2>Results</h2>
-        <p>Through the work of our team we successfully achieved a working prototype of a software hyperbolic raymarcher and a hardware accelerated CUDA raymarcher primed for generalization of non euclidean geometries. We were able to show our proof of concept: functioning hyperbolic raymarching. Now our CUDA raymarcher is designed to abstract details of what geometry we’re in, meaning implementing arbitrary (non)-euclidean geometry is as simple a task as just slotting in the right math functions.</p>
-        <br>
-        (We also got some cool bug art along the way!)
-        <br>
-        <img src="images/bugart0.png" width="45%">
-        <img src="images/bugart1.png" width="45%">
-        <img src="images/bugart2.png" width="45%">
-        <img src="images/bugart3.png" width="45%">
-        <br>
-        <br>
-
-        A video of the development of the hyperbolic raymarcher prototype can be seen <a href="https://youtu.be/Il_7HWKKSwU">here</a> and a video of the interactive demo <a href="https://youtu.be/0cmYqJrQKbc">here</a>.
-
     </section>
 
     <section id="contributions">
@@ -249,6 +295,22 @@
             <h3>Presentation</h3>
             <p><a href="https://docs.google.com/presentation/d/1DGa2JtVpf00P6wfAUAklz1qCobAbrCqFwy42HWV87XU/edit?usp=sharing">View Presentation</a></p>
         </blockquote>
+    </section>
+
+        <section id="results">
+            <h2>Bug art</h2>
+            <br>
+            <img src="images/bugart0.png" width="45%">
+            <img src="images/bugart1.png" width="45%">
+            <img src="images/bugart2.png" width="45%">
+            <img src="images/bugart3.png" width="45%">
+            <img src="images/buggy.gif" width="45%">
+            <br>
+            <br>
+    
+            A video of the development of the hyperbolic raymarcher prototype can be seen <a href="https://youtu.be/Il_7HWKKSwU">here</a> and a video of the interactive demo <a href="https://youtu.be/0cmYqJrQKbc">here</a>.
+    
+        </section>    
     </section>
 
 </body>
